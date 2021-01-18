@@ -1,6 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const consoleTable = require("console.table");
+const promiseMysql = require("promise-mysql");
 
 const connectionProperties = {
     host: "localhost",
@@ -119,7 +120,7 @@ connection.connect(function(err) {
   }
 
   function viewEmployees() {
-    let query = "Select e.id, e.first_name, e.last_name, role.title, department.name AS department";
+    let query = "SELECT * FROM employee";
     console.log("Selecting all employees...\n");
     connection.query(query, function(err, res){
       if (err) throw err;
@@ -128,5 +129,73 @@ connection.connect(function(err) {
       createFriends();
     });
   }
-  
-  
+
+  // add a new employee
+
+  function addEmployee() {
+    
+      inquirer.prompt([
+        {
+          name: "firstName",
+          type: "input",
+          message: " Employee first name:",
+          // validate: function(input){
+          //   if (input === ""){
+          //     console.log("**Required Field**");
+          //     return false;
+          //   }
+          //   else{
+          //     return true;
+          //   }
+          // }
+        },
+        {
+          name: "lastName",
+          type: "input",
+          message: " Employee last name :",
+          // validate: function(input){
+          //   if (input === ""){
+          //     console.log("**Required Field**"),
+          //     return false;
+          //   }
+          //   else{
+          //     return true;
+          //   }
+          // }
+        },
+        {
+          name: "role",
+          type: "list",
+          message: "What is the employee's role?",
+          choices: selectRole()
+        },
+        {
+          name: "choice",
+          type: "rawlist",
+          message: "Who is their manager?",
+          choices: selectManger()
+        }
+        
+        ]).then(function(val) {
+          const roleId= selectRole().indexOf(val.role) +1
+          const managerId= selectManger().indexOf(val.choice) +1
+          connection.query("INSERT INTO employee SET ?",{
+            first_name: val.firstName,
+            last_name: val.lastName,
+            manager_id: managerId,
+            role_id: roleId
+          }, function(err){
+            if (err) throw err
+            console.table(val)
+            startPrompt()
+          })
+      })
+
+    }
+
+    
+
+    
+
+
+    
