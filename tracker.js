@@ -46,7 +46,7 @@ connection.connect(function(err) {
           break;
   
         case "View Employees":
-          viewEmployee();
+          viewEmployees();
           break;
   
         case "Add Department":
@@ -105,4 +105,28 @@ connection.connect(function(err) {
           );
       });
   }
+
+  // View employee's roles
+
+  function viewRole() {
+    console.log("Selecting all roles...\n");
+    connection.query("SELECT * FROM roles", function(err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.table(res);
+      createFriends();
+    });
+  }
+
+  function viewEmployees() {
+    let query = "Select e.id, e.first_name, e.last_name, role.title, department.name AS department";
+    console.log("Selecting all employees...\n");
+    connection.query(query, function(err, res){
+      if (err) throw err;
+      console.log("\n");
+      console.table(res);
+      createFriends();
+    });
+  }
+  
   
